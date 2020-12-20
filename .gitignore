@@ -1,0 +1,11 @@
+#ignore
+*
+!*/
+!.gitignore
+!*.cc
+!*.cpp
+!*.h
+!*.hpp
+!Makefile
+/cmake-build-debug/
+/config/version.h

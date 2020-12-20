@@ -1,0 +1,33 @@
+
+MACRO(SUBDIRLIST result curdir)
+    FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+    SET(dirlist "")
+    FOREACH (child ${children})
+        IF (IS_DIRECTORY ${curdir}/${child})
+            LIST(APPEND dirlist ${child})
+        ENDIF ()
+    ENDFOREACH ()
+    SET(${result} ${dirlist})
+ENDMACRO()
+
+function(AddChildren father)
+    SUBDIRLIST(children ${father})
+    list(LENGTH children childNum)
+    if (${childNum} EQUAL 0)
+        STRING(REGEX REPLACE ".*/(.*)" "\\1" CURRENT_FOLDER ${father})
+        if (NOT EXISTS ${father}/CMakeLists.txt)
+            FILE(WRITE ${father}/CMakeLists.txt
+                    "project(${CURRENT_FOLDER})\n"
+                    "include(\${CMAKE_SOURCE_DIR}/cmake/source.cmake)\n")
+        endif ()
+        add_subdirectory(${father})
+    else ()
+        foreach (child ${children})
+            AddChildren("${father}/${child}")
+        endforeach ()
+    endif ()
+endfunction()
+
+function(AddSub)
+    AddChildren(${PROJECT_SOURCE_DIR})
+endfunction()
