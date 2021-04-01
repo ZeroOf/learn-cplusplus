@@ -8,4 +8,4 @@
 !*.hpp
 !Makefile
 /cmake-build-debug/
-/config/version.h
+/src/config/version.h
