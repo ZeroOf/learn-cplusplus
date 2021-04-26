@@ -20,9 +20,6 @@ void Graph<T>::AddNode(int key, T value) {
         nodes_.template emplace_back(value, nullptr);
         return;
     }
-
-
-
 }
 
 #endif //CPP_PRACTICE_GRAPH_HPP

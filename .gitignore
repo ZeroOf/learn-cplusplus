@@ -8,4 +8,5 @@
 !*.hpp
 !Makefile
 /cmake-build-debug/
-/src/config/version.h
+/.idea/
+/cmake-build-debug-coverage/

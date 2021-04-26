@@ -4,6 +4,8 @@
 // include headers that implement a archive in simple text format
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 
 using namespace std;
 
@@ -38,14 +40,14 @@ public:
 
 int main() {
     // create and open a character archive for output
-    std::ofstream ofs("filename");
+    std::ofstream ofs("../data/filename");
 
     // create class instance
     const gps_position g(35, 59, 24.567f);
 
     // save data to archive
     {
-        boost::archive::text_oarchive oa(ofs);
+        boost::archive::binary_oarchive oa(ofs);
         // write class instance to archive
         oa << g;
         // archive and stream closed when destructors are called
@@ -55,8 +57,8 @@ int main() {
     gps_position newg;
     {
         // create and open an archive for input
-        std::ifstream ifs("filename");
-        boost::archive::text_iarchive ia(ifs);
+        std::ifstream ifs("../data/filename");
+        boost::archive::binary_iarchive ia(ifs);
         // read class state from archive
         ia >> newg;
         std::cout << newg.degrees << "\t" << newg.minutes << "\t" << newg.seconds << std::endl;
