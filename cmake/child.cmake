@@ -18,9 +18,10 @@ function(AddChildren father)
         SUBDIRLIST(children ${father})
         list(LENGTH children childNum)
         if (${childNum} EQUAL 0)
-            STRING(REGEX REPLACE "/" "_" CURRENT_FOLDER ${father})
+            file(RELATIVE_PATH relativePath ${CMAKE_SOURCE_DIR}/src ${father})
+            STRING(REGEX REPLACE "/" "_" PNAME ${relativePath})
             FILE(WRITE ${father}/CMakeLists.txt
-                    "project(${CURRENT_FOLDER})\n"
+                    "project(${PNAME})\n"
                     "include(\${CMAKE_SOURCE_DIR}/cmake/source.cmake)\n")
             add_subdirectory(${father})
         else ()
