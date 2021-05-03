@@ -1,6 +1,5 @@
 #include <boost/io/ios_state.hpp>
 #include <iostream>
-#include <ostream>
 
 void new_hex_my_byte(std::ostream& os, char byte)
 {

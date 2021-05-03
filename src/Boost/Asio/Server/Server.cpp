@@ -1,13 +1,3 @@
-//
-// server.cpp
-// ~~~~~~~~~~
-//
-// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -16,71 +6,59 @@
 
 using boost::asio::ip::tcp;
 
-class session : public std::enable_shared_from_this<session>
-{
+class session : public std::enable_shared_from_this<session> {
 public:
-    session(tcp::socket socket, boost::asio::ssl::context& context)
-            : socket_(std::move(socket), context)
-    {
+    session(tcp::socket socket, boost::asio::ssl::context &context)
+            : socket_(std::move(socket), context), m_strand(socket.get_executor()) {
     }
 
-    void start()
-    {
+    void start() {
         do_handshake();
     }
 
 private:
-    void do_handshake()
-    {
+    void do_handshake() {
         auto self(shared_from_this());
         socket_.async_handshake(boost::asio::ssl::stream_base::server,
-                                [this, self](const boost::system::error_code& error)
-                                {
-                                    if (!error)
-                                    {
+                                [this, self](const boost::system::error_code &error) {
+                                    if (!error) {
                                         do_read();
                                     }
                                 });
+        boost::asio::post(m_strand, session::do_read, self);
     }
 
-    void do_read()
-    {
+    void do_read() {
         auto self(shared_from_this());
         socket_.async_read_some(boost::asio::buffer(data_),
-                                [this, self](const boost::system::error_code& ec, std::size_t length)
-                                {
-                                    if (!ec)
-                                    {
+                                [this, self](const boost::system::error_code &ec, std::size_t length) {
+                                    if (!ec) {
                                         do_write(length);
                                     }
                                 });
     }
 
-    void do_write(std::size_t length)
-    {
+    void do_write(std::size_t length) {
         auto self(shared_from_this());
         boost::asio::async_write(socket_, boost::asio::buffer(data_, length),
-                                 [this, self](const boost::system::error_code& ec,
-                                              std::size_t /*length*/)
-                                 {
-                                     if (!ec)
-                                     {
+                                 [this, self](const boost::system::error_code &ec,
+                                              std::size_t /*length*/) {
+                                     if (!ec) {
                                          do_read();
                                      }
                                  });
     }
 
     boost::asio::ssl::stream<tcp::socket> socket_;
+    boost::asio::strand<boost::asio::ip::tcp::socket::executor_type> m_strand;
     char data_[1024];
 };
 
-class server
-{
+class server {
 public:
-    server(boost::asio::io_context& io_context, unsigned short port)
+    server(boost::asio::io_context &io_context, unsigned short port)
             : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
-              context_(boost::asio::ssl::context::sslv23)
-    {
+              context_(boost::asio::ssl::context::sslv23) {
         context_.set_options(
                 boost::asio::ssl::context::default_workarounds
                 | boost::asio::ssl::context::no_sslv2
@@ -94,18 +72,14 @@ public:
     }
 
 private:
-    std::string get_password() const
-    {
+    std::string get_password() const {
         return "test";
     }
 
-    void do_accept()
-    {
+    void do_accept() {
         acceptor_.async_accept(
-                [this](const boost::system::error_code& error, tcp::socket socket)
-                {
-                    if (!error)
-                    {
+                [this](const boost::system::error_code &error, tcp::socket socket) {
+                    if (!error) {
                         std::make_shared<session>(std::move(socket), context_)->start();
                     }
 
@@ -117,12 +91,9 @@ private:
     boost::asio::ssl::context context_;
 };
 
-int main(int argc, char* argv[])
-{
-    try
-    {
-        if (argc != 2)
-        {
+int main(int argc, char *argv[]) {
+    try {
+        if (argc != 2) {
             std::cerr << "Usage: server <port>\n";
             return 1;
         }
@@ -134,8 +105,7 @@ int main(int argc, char* argv[])
 
         io_context.run();
     }
-    catch (std::exception& e)
-    {
+    catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << "\n";
     }
 

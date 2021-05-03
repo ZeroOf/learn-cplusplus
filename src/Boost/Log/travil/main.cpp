@@ -111,12 +111,11 @@ void test2() {
     BOOST_LOG_SEV(slg, critical) << "Everything crumbles, shoot me now!";
 }
 
-void foo()
-{
+void foo() {
     src::logger lg;
 
     // Register a mutable constant attribute that always yields value -5
-    attrs::mutable_constant< int > attr(-5);
+    attrs::mutable_constant<int> attr(-5);
     lg.add_attribute("MyInteger", attr);
     BOOST_LOG(lg) << "This record has MyInteger == -5";
 
