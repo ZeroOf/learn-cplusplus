@@ -4,14 +4,19 @@
 
 #include "tcp_client.h"
 #include <boost/make_shared.hpp>
+#include "test_client.h"
+
+boost::shared_ptr<TcpIO::TestClient> Start(boost::asio::io_context &ioContext);
 
 int main() {
     boost::asio::io_context ioContext;
-    boost::asio::ip::tcp::resolver resolver(ioContext);
-    resolver.async_resolve("192.168.223.78", "22", [&ioContext](const boost::system::error_code &ec,
-                                                             boost::asio::ip::tcp::resolver::results_type remote) {
-        boost::shared_ptr<TcpClient> tcpClient = boost::make_shared<TcpClient>(ioContext);
-        tcpClient->Start(remote);
-    });
+    auto pC = Start(ioContext);
     ioContext.run();
+}
+
+boost::shared_ptr<TcpIO::TestClient> Start(boost::asio::io_context &ioContext) {
+    boost::shared_ptr<TcpIO::TestClient> pClient = boost::make_shared<TcpIO::TestClient>(ioContext, "127.0.0.1",
+                                                                                         "1133");
+    pClient->Start();
+    return pClient;
 }
