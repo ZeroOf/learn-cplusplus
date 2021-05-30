@@ -11,56 +11,53 @@
 #include <map>
 #include <functional>
 
-namespace wd
-{
+namespace wd {
 
 class Acceptor;
-class EpollPoller : Noncopyable
-{
+class EpollPoller : Noncopyable {
 public:
-	typedef TcpConnection::TcpConnectionCallback EpollCallback;
-	typedef std::function<void()> Functor;
+    typedef TcpConnection::TcpConnectionCallback EpollCallback;
+    typedef std::function<void()> Functor;
 
-	EpollPoller(Acceptor & acceptor);
-	~EpollPoller();
+    EpollPoller(Acceptor& acceptor);
+    ~EpollPoller();
 
-	void loop();
-	void unloop();
-	void runInLoop(const Functor && cb);
-	void doPendingFunctors();
-	void wakeup();
+    void loop();
+    void unloop();
+    void runInLoop(const Functor&& cb);
+    void doPendingFunctors();
+    void wakeup();
 
-	void setConnectionCallback(EpollCallback cb);
-	void setMessageCallback(EpollCallback cb);
-	void setCloseCallback(EpollCallback cb);
+    void setConnectionCallback(EpollCallback cb);
+    void setMessageCallback(EpollCallback cb);
+    void setCloseCallback(EpollCallback cb);
 
 private:
-	void waitEpollfd();
-	void handleConnection();
-	void handleMessage(int peerfd);
-	void handleRead();
-	
+    void waitEpollfd();
+    void handleConnection();
+    void handleMessage(int peerfd);
+    void handleRead();
+
 private:
-	Acceptor & acceptor_;
-	int epollfd_;
-	int eventfd_;
-	int listenfd_;
-	bool isLooping_;
+    Acceptor& acceptor_;
+    int epollfd_;
+    int eventfd_;
+    int listenfd_;
+    bool isLooping_;
 
-	MutexLock _mutex;
-	std::vector<Functor> _pendingFunctors;
+    MutexLock _mutex;
+    std::vector<Functor> _pendingFunctors;
 
-	typedef std::vector<struct epoll_event> EventList;
-	EventList eventsList_;
+    typedef std::vector<struct epoll_event> EventList;
+    EventList eventsList_;
 
-	typedef std::map<int, TcpConnectionPtr> ConnectionMap;
-	ConnectionMap connMap_;
+    typedef std::map<int, TcpConnectionPtr> ConnectionMap;
+    ConnectionMap connMap_;
 
-	EpollCallback onConnectionCb_;
-	EpollCallback onMessageCb_;
-	EpollCallback onCloseCb_;
+    EpollCallback onConnectionCb_;
+    EpollCallback onMessageCb_;
+    EpollCallback onCloseCb_;
 };
-
 
 }//end of namespace wd
 

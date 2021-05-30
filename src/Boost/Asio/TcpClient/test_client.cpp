@@ -19,7 +19,7 @@ void TestClient::OnConnected() {
 }
 
 void TestClient::OnConnectFailed() {
-
+    LOG_INFO("Connect to " << host_ << ":" << service_ << " failed");
 }
 
 void TestClient::OnSend(bool isSendSuccess, uint32_t msgType) {
