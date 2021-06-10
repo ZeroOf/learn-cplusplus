@@ -11,7 +11,13 @@ class HeapSort {
 public:
    void Sort(std::vector<int> &numbers);
 private:
-    void Heapify(std::vector<int>& numbers, size_t top);
+    void Heapify(std::vector<int> &numbers, size_t top, size_t buttom);
+    void Heapify(std::vector<int>& numbers);
+
+    size_t LeftChild(size_t top) const;
+
+    size_t RightChild(size_t top) const;
+    size_t Father(size_t position) const;
 };
 
 
